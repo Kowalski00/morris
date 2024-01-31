@@ -4,6 +4,7 @@ This project is to have a little fun with the Morris Sequence and to learn a bit
 
 The Morris Sequence is also know as 'look-and-say' Sequence where each row explains the previous row by counting the number of digits in groups.
 
+```
 1
 1 1                   =>  one 1
 2 1                   =>  two 1
@@ -15,6 +16,7 @@ The Morris Sequence is also know as 'look-and-say' Sequence where each row expla
 .
 .
 .
+```
 
 The goals for this project are:
 
