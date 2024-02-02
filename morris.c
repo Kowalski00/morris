@@ -1,15 +1,34 @@
-#include<stdio.h>
+#include <stdio.h>
+#include <string.h>
 
-void printArray(int *array, int length) {
-    printf(" # ");
-    for(int i = 0; i < length; i++ ) {
+
+int getArrayLength(int *array) {
+    return ( sizeof(&array) / sizeof(&array[0])); // Something wrong here
+}
+
+void printArray(int *array, char *symbol) {
+    printf(symbol);
+    for(int i = 0; i < getArrayLength(array); i++ ) {
         printf(" %d",array[i]);
     }
 }
 
-void clearArray(int *array, int length) {
-    for(int i = 0; i < length; i++ ) {
+void printArrayAndFilterZeros(int *array) {
+    for(int i = 0; i < getArrayLength(array); i++ ) {
+        if(array[i] != 0) printf(" %d",array[i]);
+    }
+}
+
+void clearArray(int *array) {
+    for(int i = 0; i < getArrayLength(array); i++ ) {
         array[i] = 0;
+    }
+}
+
+void copyArray(int *src, int *destiny) {
+
+    for(int i = 0; i < getArrayLength(src); i++ ) {
+        destiny[i] = src[i];
     }
 }
 
@@ -19,35 +38,39 @@ int main() {
     int currentRow[6] = { 1, 0, 0, 0, 0, 0 };
     int lookRow[6] = { 0, 0, 0, 0, 0, 0 };
     int groupDigit[6] = { 0, 0, 0, 0, 0, 0 };
-    int nextRow[6] = { 0, 0, 0, 0, 0, 0 };
+    int nextRow[6] = { 0, 0, 0, 0, 0, 0 }; 
 
     for(int row = 0; row < 3; row++) {
 
         int currentDigit = currentRow[0];
+        int lastDigit = currentRow[0];
 
-        for(int r = 0; r < ( sizeof(currentRow) / sizeof(currentRow[0]) ); r++ ) {
+        for(int r = 0; r < getArrayLength(currentRow) ; r++ ) {
 
-            if(currentDigit == currentRow[r]) {
+            currentDigit = currentRow[r];
+
+            if(lastDigit == currentDigit) {
                 
-                *(groupDigit+r) = currentRow[r];
+                groupDigit[r] = currentDigit;
 
             } else {
                 nextRow[r-1] = r;
                 nextRow[r] = groupDigit[r-1];
-                clearArray( groupDigit, ( sizeof(groupDigit) / sizeof(groupDigit[0]))  );
+                clearArray( groupDigit  );
+                break;
             }
 
-            if(currentRow[r] != 0) {
-
-                printf(" %d",currentRow[r]);
-            }
-
+            lastDigit = currentDigit;
 
         }
-        printArray( nextRow, ( sizeof(nextRow) / sizeof(nextRow[0])) );
-        printf("\n");
 
-        currentRow[++rowSize] = 1;
+        copyArray( nextRow, currentRow);
+        clearArray( nextRow );
+        printArrayAndFilterZeros( currentRow );
+
+        //currentRow[++rowSize] = 1;
+
+        printf("\n");
     }
 
 
