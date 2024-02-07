@@ -1,33 +1,28 @@
 #include <stdio.h>
 #include <string.h>
 
-
-int getArrayLength(int *array) {
-    return ( sizeof(&array) / sizeof(&array[0])); // Something wrong here
-}
-
 void printArray(int *array, char *symbol) {
     printf(symbol);
-    for(int i = 0; i < getArrayLength(array); i++ ) {
+    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
         printf(" %d",array[i]);
     }
 }
 
 void printArrayAndFilterZeros(int *array) {
-    for(int i = 0; i < getArrayLength(array); i++ ) {
+    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
         if(array[i] != 0) printf(" %d",array[i]);
     }
 }
 
 void clearArray(int *array) {
-    for(int i = 0; i < getArrayLength(array); i++ ) {
+    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
         array[i] = 0;
     }
 }
 
 void copyArray(int *src, int *destiny) {
 
-    for(int i = 0; i < getArrayLength(src); i++ ) {
+    for(int i = 0; i < sizeof(src) / sizeof(src[0]); i++ ) {
         destiny[i] = src[i];
     }
 }
@@ -35,17 +30,17 @@ void copyArray(int *src, int *destiny) {
 int main() {
 
     int rowSize = 0;
-    int currentRow[6] = { 1, 0, 0, 0, 0, 0 };
-    int lookRow[6] = { 0, 0, 0, 0, 0, 0 };
-    int groupDigit[6] = { 0, 0, 0, 0, 0, 0 };
-    int nextRow[6] = { 0, 0, 0, 0, 0, 0 }; 
+    int currentRow[] = { 1, 0, 0, 0, 0, 0 };
+    int lookRow[] = { 0, 0, 0, 0, 0, 0 };
+    int groupDigit[] = { 0, 0, 0, 0, 0, 0 };
+    int nextRow[] = { 0, 0, 0, 0, 0, 0 }; 
 
     for(int row = 0; row < 3; row++) {
 
         int currentDigit = currentRow[0];
         int lastDigit = currentRow[0];
 
-        for(int r = 0; r < getArrayLength(currentRow) ; r++ ) {
+        for(int r = 0; r < sizeof(currentRow) / sizeof(currentRow[0]) ; r++ ) {
 
             currentDigit = currentRow[r];
 
