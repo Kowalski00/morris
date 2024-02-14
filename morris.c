@@ -30,12 +30,18 @@ void copyArray(int *src, int *destiny) {
 int main() {
 
     int rowSize = 0;
+    int digitGroupQuantity = 0;
     int currentRow[] = { 1, 0, 0, 0, 0, 0 };
     int lookRow[] = { 0, 0, 0, 0, 0, 0 };
-    int groupDigit[] = { 0, 0, 0, 0, 0, 0 };
     int nextRow[] = { 0, 0, 0, 0, 0, 0 }; 
 
-    for(int row = 0; row < 3; row++) {
+    // PrintArrayAndFilterZeros
+    for(int i = 0; i < sizeof(currentRow) / sizeof(currentRow[0]); i++ ) {
+        if(currentRow[i] != 0) printf(" %d",currentRow[i]);
+    }
+    printf("\n");
+
+    for(int row = 0; row < 4; row++) {
 
         int currentDigit = currentRow[0];
         int lastDigit = currentRow[0];
@@ -46,24 +52,50 @@ int main() {
 
             if(lastDigit == currentDigit) {
                 
-                groupDigit[r] = currentDigit;
+                digitGroupQuantity++;
 
             } else {
-                nextRow[r-1] = r;
-                nextRow[r] = groupDigit[r-1];
-                clearArray( groupDigit  );
-                break;
+
+                for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
+                    if(nextRow[i] == 0) {
+                        nextRow[i] = digitGroupQuantity;
+                        break;
+                    }
+                }
+
+                for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
+                    if(nextRow[i] == 0) {
+                        nextRow[i] = lastDigit;
+                        break;
+                    }
+                }
+                
+                
+                digitGroupQuantity = 0;
+                if(currentDigit == 0) break;
+                else digitGroupQuantity = 1;
+                lastDigit = currentDigit;
+                continue;
             }
 
             lastDigit = currentDigit;
 
         }
 
-        copyArray( nextRow, currentRow);
-        clearArray( nextRow );
-        printArrayAndFilterZeros( currentRow );
+        // Copy array
+        for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
+            currentRow[i] = nextRow[i];
+        }
 
-        //currentRow[++rowSize] = 1;
+        // Clear array
+        for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
+            nextRow[i] = 0;
+        }
+
+        // PrintArrayAndFilterZeros
+        for(int i = 0; i < sizeof(currentRow) / sizeof(currentRow[0]); i++ ) {
+            if(currentRow[i] != 0) printf(" %d",currentRow[i]);
+        }
 
         printf("\n");
     }
@@ -71,4 +103,3 @@ int main() {
 
     return 0;
 }
-
