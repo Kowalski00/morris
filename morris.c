@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#define SIZE 30
+#define ROW_SIZE 11
+
 void printArray(int *array, char *symbol) {
     printf(symbol);
     for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
@@ -8,40 +11,46 @@ void printArray(int *array, char *symbol) {
     }
 }
 
-void printArrayAndFilterZeros(int *array) {
-    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
-        if(array[i] != 0) printf(" %d",array[i]);
+void printArrayAndFilterZeros(int *array, size_t len) {
+    unsigned int *dst = array;
+    for(int i = 0; i < len; i++ ) {
+        if(*dst != 0) printf(" %d",*dst);
+        dst++;
     }
 }
 
-void clearArray(int *array) {
-    for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
-        array[i] = 0;
+void clearArray(int *array, size_t len) {
+    unsigned int *dst = array;
+    for(int i = 0; i < len; i++ ) {
+        *dst = 0;
+        dst++;
     }
 }
 
-void copyArray(int *src, int *destiny) {
-
-    for(int i = 0; i < sizeof(src) / sizeof(src[0]); i++ ) {
-        destiny[i] = src[i];
+void copyArray(int *src, int *destiny, size_t len) {
+    unsigned int *psrc = src;
+    unsigned int *pdst = destiny;
+    for(int i = 0; i < len; i++ ) {
+        *pdst = *psrc;
+        pdst++;
+        psrc++;
     }
 }
 
 int main() {
 
-    int rowSize = 0;
     int digitGroupQuantity = 0;
-    int currentRow[] = { 1, 0, 0, 0, 0, 0 };
-    int lookRow[] = { 0, 0, 0, 0, 0, 0 };
-    int nextRow[] = { 0, 0, 0, 0, 0, 0 }; 
+    int currentRow[SIZE];
+    int nextRow[SIZE];
+    
+    clearArray( currentRow, sizeof(currentRow) / sizeof(currentRow[0]) );
+    clearArray( nextRow, sizeof(nextRow) / sizeof(nextRow[0]) );
+    currentRow[0] = 1;
 
-    // PrintArrayAndFilterZeros
-    for(int i = 0; i < sizeof(currentRow) / sizeof(currentRow[0]); i++ ) {
-        if(currentRow[i] != 0) printf(" %d",currentRow[i]);
-    }
-    printf("\n");
+    printf("\n %3d |  ", 1);
+    printArrayAndFilterZeros(currentRow, sizeof(currentRow) / sizeof(currentRow[0]));
 
-    for(int row = 0; row < 4; row++) {
+    for(int row = 0; row < ROW_SIZE; row++) {
 
         int currentDigit = currentRow[0];
         int lastDigit = currentRow[0];
@@ -50,11 +59,7 @@ int main() {
 
             currentDigit = currentRow[r];
 
-            if(lastDigit == currentDigit) {
-                
-                digitGroupQuantity++;
-
-            } else {
+            if(lastDigit != currentDigit) {
 
                 for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
                     if(nextRow[i] == 0) {
@@ -78,28 +83,21 @@ int main() {
                 continue;
             }
 
+            digitGroupQuantity++;
+
             lastDigit = currentDigit;
 
         }
 
-        // Copy array
-        for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
-            currentRow[i] = nextRow[i];
-        }
+        copyArray(nextRow, currentRow, SIZE);
+        
+        clearArray( nextRow, sizeof(nextRow) / sizeof(nextRow[0]) );
 
-        // Clear array
-        for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
-            nextRow[i] = 0;
-        }
-
-        // PrintArrayAndFilterZeros
-        for(int i = 0; i < sizeof(currentRow) / sizeof(currentRow[0]); i++ ) {
-            if(currentRow[i] != 0) printf(" %d",currentRow[i]);
-        }
-
-        printf("\n");
+        printf("\n %3d |  ", row+1);
+        printArrayAndFilterZeros(currentRow, sizeof(currentRow) / sizeof(currentRow[0]));
     }
 
 
+    printf("\n");
     return 0;
 }
