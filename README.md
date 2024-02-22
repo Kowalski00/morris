@@ -20,7 +20,7 @@ The Morris Sequence is also know as 'look-and-say' Sequence where each row expla
 
 The goals for this project are:
 
-- [ ] Create a program that will print the sequence up to 10 rows;
+- [X] Create a program that will print the sequence up to 10 rows;
 - [ ] Ask for a input N to print the sequence up to the N row;
 - [ ] Describe the sequence along the rows;
 - [ ] Ask for a single digit number to begin the sequence with that number;
