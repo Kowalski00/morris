@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#define SIZE 30
-#define ROW_SIZE 11
+#define ROW_SIZE 30
+#define LINES_QTTY 11
 
 void printArray(int *array, char *symbol) {
     printf(symbol);
@@ -12,6 +12,16 @@ void printArray(int *array, char *symbol) {
 }
 
 void printArrayAndFilterZeros(int *array, size_t len) {
+    unsigned int *dst = array;
+    for(int i = 0; i < len; i++ ) {
+        if(*dst != 0) printf(" %d",*dst);
+        dst++;
+    }
+}
+
+void printLine(int lineNumber, int *array, size_t len) {
+
+    printf("\n %3d |  ", lineNumber);
     unsigned int *dst = array;
     for(int i = 0; i < len; i++ ) {
         if(*dst != 0) printf(" %d",*dst);
@@ -40,47 +50,39 @@ void copyArray(int *src, int *destiny, size_t len) {
 int main() {
 
     int digitGroupQuantity = 0;
-    int currentRow[SIZE];
-    int nextRow[SIZE];
+    int currentRow[ROW_SIZE];
+    int nextRow[ROW_SIZE];
+    int line = 1;
     
-    clearArray( currentRow, sizeof(currentRow) / sizeof(currentRow[0]) );
-    clearArray( nextRow, sizeof(nextRow) / sizeof(nextRow[0]) );
+    clearArray( currentRow, ROW_SIZE);
+    clearArray( nextRow, ROW_SIZE );
     currentRow[0] = 1;
 
-    printf("\n %3d |  ", 1);
-    printArrayAndFilterZeros(currentRow, sizeof(currentRow) / sizeof(currentRow[0]));
-
-    for(int row = 0; row < ROW_SIZE; row++) {
+    printLine(line, currentRow, ROW_SIZE);
+    
+    while(line < LINES_QTTY) {
 
         int currentDigit = currentRow[0];
         int lastDigit = currentRow[0];
 
-        for(int r = 0; r < sizeof(currentRow) / sizeof(currentRow[0]) ; r++ ) {
+        for(int r = 0; r < ROW_SIZE ; r++ ) {
 
             currentDigit = currentRow[r];
 
             if(lastDigit != currentDigit) {
 
-                for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
+                for(int i = 0; i < ROW_SIZE; i++ ) {
                     if(nextRow[i] == 0) {
                         nextRow[i] = digitGroupQuantity;
+                        nextRow[++i] = lastDigit;
                         break;
                     }
                 }
 
-                for(int i = 0; i < sizeof(nextRow) / sizeof(nextRow[0]); i++ ) {
-                    if(nextRow[i] == 0) {
-                        nextRow[i] = lastDigit;
-                        break;
-                    }
-                }
-                
-                
                 digitGroupQuantity = 0;
+
                 if(currentDigit == 0) break;
-                else digitGroupQuantity = 1;
-                lastDigit = currentDigit;
-                continue;
+                
             }
 
             digitGroupQuantity++;
@@ -89,14 +91,13 @@ int main() {
 
         }
 
-        copyArray(nextRow, currentRow, SIZE);
+        copyArray(nextRow, currentRow, ROW_SIZE);
         
-        clearArray( nextRow, sizeof(nextRow) / sizeof(nextRow[0]) );
+        clearArray( nextRow, ROW_SIZE );
 
-        printf("\n %3d |  ", row+1);
-        printArrayAndFilterZeros(currentRow, sizeof(currentRow) / sizeof(currentRow[0]));
+        printLine(line+1, currentRow, ROW_SIZE);
+        line++;
     }
-
 
     printf("\n");
     return 0;
