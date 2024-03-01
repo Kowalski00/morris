@@ -47,6 +47,19 @@ void copyArray(int *src, int *destiny, size_t len) {
     }
 }
 
+void enrichRow(int digitQuantity, int digit, int *array) {
+    unsigned int *dst = array;
+    for(int i = 0; i < ROW_SIZE; i++ ) {
+        if(*dst == 0) {
+            *dst = digitQuantity;
+            *dst++;
+            *dst = digit;
+            break;
+        }
+        *dst++;
+    }
+}
+
 int main() {
 
     int digitGroupQuantity = 0;
@@ -71,13 +84,7 @@ int main() {
 
             if(lastDigit != currentDigit) {
 
-                for(int i = 0; i < ROW_SIZE; i++ ) {
-                    if(nextRow[i] == 0) {
-                        nextRow[i] = digitGroupQuantity;
-                        nextRow[++i] = lastDigit;
-                        break;
-                    }
-                }
+                enrichRow(digitGroupQuantity,lastDigit,nextRow); // NOTE: Why this function making compile/execution taking so long to execute
 
                 digitGroupQuantity = 0;
 
