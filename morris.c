@@ -4,6 +4,10 @@
 #define ROW_SIZE 30
 #define LINES_QTTY 11
 
+const char *n_desc[] = {
+    "zero","one","two","three","four","five","six","seven","eight","nine"
+};
+
 void printArray(int *array, char *symbol) {
     printf(symbol);
     for(int i = 0; i < sizeof(array) / sizeof(array[0]); i++ ) {
@@ -53,10 +57,23 @@ void enrichRow(int digitQuantity, int digit, int *array) {
         if(*dst == 0) {
             *dst = digitQuantity;
             *dst++;
-            *dst = digit;
-            break;
+            *dst = digit; break;
         }
         *dst++;
+    }
+}
+
+void printLineDescription(int lineNumber, int *array, size_t len) {
+
+    printf("\n        --> ");
+    for(int i=0; i < len; i+=2) {
+
+        if(*array == 0) continue;
+
+        printf("%d ", *n_desc[*array++]);
+        printf("%d ", *array++);
+
+        if(*array != 0) printf("and ");
     }
 }
 
@@ -103,6 +120,7 @@ int main() {
         clearArray( nextRow, ROW_SIZE );
 
         printLine(line+1, currentRow, ROW_SIZE);
+        printLineDescription(line+1, currentRow, ROW_SIZE);
         line++;
     }
 
