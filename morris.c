@@ -5,7 +5,7 @@
 #define LINES_QTTY 11
 
 const char *n_desc[] = {
-    "zero","one","two","three","four","five","six","seven","eight","nine"
+    "Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"
 };
 
 void printArray(int *array, char *symbol) {
@@ -70,7 +70,7 @@ void printLineDescription(int lineNumber, int *array, size_t len) {
 
         if(*array == 0) continue;
 
-        printf("%d ", *n_desc[*array++]);
+        printf("%s ", n_desc[*array++]);
         printf("%d ", *array++);
 
         if(*array != 0) printf("and ");
