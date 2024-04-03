@@ -22,6 +22,6 @@ The goals for this project are:
 
 - [X] Create a program that will print the sequence up to 10 lines;
 - [ ] Ask for a input N to print the sequence up to the N line;
-- [ ] Describe the sequence along the lines;
+- [X] Describe the sequence along the lines;
 - [ ] Ask for a single digit number to begin the sequence with that number;
 - [ ] Ask for any number to begin the sequence.
