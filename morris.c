@@ -10,13 +10,47 @@ const char *n_desc[] = {
     "Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"
 };
 
-void printLine(int lineNumber, int *array, size_t len, HANDLE handleConsole, WORD color, WORD savedAttributes)
+int lastColorKey;
+
+WORD getRandomColor()
+{
+    int colorKey;
+    do{
+        colorKey =  rand() % 4;
+    } while (colorKey == lastColorKey || colorKey == 0);
+    lastColorKey = colorKey;
+        
+    switch(colorKey)
+    {
+        case 1:
+        {
+            return FOREGROUND_BLUE;
+            break;
+        }
+        case 2:
+        {
+            return FOREGROUND_GREEN;
+            break;
+        }
+        case 3:
+        {
+            return FOREGROUND_RED;
+            break;
+        }
+    }
+}
+
+void printLine(int lineNumber, int *array, size_t len, HANDLE handleConsole, WORD savedAttributes)
 {
     unsigned int *dst = array;
     printf("\n %3d |  ", lineNumber);
-    SetConsoleTextAttribute(handleConsole, color);
     for(int i = 0; i < len; i++ )
     {
+        if(i % 2 == 0) 
+        {
+            WORD color = getRandomColor();
+            SetConsoleTextAttribute(handleConsole, color);
+        }
         if(*dst != 0) printf(" %d",*dst);
         dst++;
     }
@@ -82,8 +116,6 @@ int main()
     int showDescription = 0;
     int lineLimit;
     int firstNumber;
-    int lastColorKey = 0;
-    int colorKey = 0;
 
     HANDLE handleConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
@@ -101,11 +133,11 @@ int main()
 
     if(lineLimit == -1) lineLimit = 100;
 
-    clearArray( currentRow, ROW_SIZE);
-    clearArray( nextRow, ROW_SIZE );
+    clearArray(currentRow, ROW_SIZE);
+    clearArray(nextRow, ROW_SIZE);
     currentRow[0] = firstNumber;
 
-    printLine(line, currentRow, ROW_SIZE, handleConsole, FOREGROUND_BLUE, savedAttributes);
+    printLine(line, currentRow, ROW_SIZE, handleConsole, savedAttributes);
     
     while(line < lineLimit)
     {
@@ -133,18 +165,12 @@ int main()
 
         copyArray(nextRow, currentRow, ROW_SIZE);
         clearArray( nextRow, ROW_SIZE );
-
-        do{
-            colorKey =  rand() % 4;
-        } while (colorKey == lastColorKey);
         
-        WORD wColor = (FOREGROUND_BLUE);
-        printLine(line+1, currentRow, ROW_SIZE, handleConsole, wColor, savedAttributes);
+        printLine(line+1, currentRow, ROW_SIZE, handleConsole, savedAttributes);
 
         if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE);
         line++;
     }
-
     printf("\n");
     return 0;
 }
