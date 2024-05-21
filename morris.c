@@ -12,6 +12,14 @@ const char *n_desc[] = {
 
 int lastColorKey;
 
+typedef struct lineParameters {
+    int lineNumber;
+    int currentRow[ROW_SIZE];
+    size_t rowLength;
+    HANDLE handleConsole;
+    WORD attributes;
+} lineParameters;
+
 WORD getRandomColor()
 {
     int colorKey;
@@ -40,21 +48,21 @@ WORD getRandomColor()
     }
 }
 
-void printLine(int lineNumber, int *array, size_t len, HANDLE handleConsole, WORD savedAttributes)
+void printLine(struct lineParameters *parameters, int showDescription)
 {
-    unsigned int *dst = array;
-    printf("\n %3d |  ", lineNumber);
-    for(int i = 0; i < len; i++ )
+    unsigned int *dst = (int *)parameters->currentRow;
+    printf("\n %3d |\t", parameters->lineNumber);
+    for(int i = 0; i < parameters->rowLength; i++ )
     {
         if(i % 2 == 0) 
         {
             WORD color = getRandomColor();
-            SetConsoleTextAttribute(handleConsole, color);
+            SetConsoleTextAttribute(parameters->handleConsole, color);
         }
         if(*dst != 0) printf(" %d",*dst);
         dst++;
     }
-    SetConsoleTextAttribute(handleConsole, savedAttributes);
+    SetConsoleTextAttribute(parameters->handleConsole, parameters->attributes);
 }
 
 void clearArray(int *array, size_t len)
@@ -95,7 +103,7 @@ void enrichRow(int digitQuantity, int digit, int *array)
 
 void printLineDescription(int lineNumber, int *array, size_t len)
 {
-    printf("\n     |    --> ");
+    printf("\n     |\t  --> ");
     for(int i=0; i < len; i+=2)
     {
         if(*array == 0) continue;
@@ -137,7 +145,14 @@ int main()
     clearArray(nextRow, ROW_SIZE);
     currentRow[0] = firstNumber;
 
-    printLine(line, currentRow, ROW_SIZE, handleConsole, savedAttributes);
+    lineParameters parameters;
+    parameters.lineNumber = line;
+    copyArray(currentRow, parameters.currentRow, ROW_SIZE);
+    parameters.rowLength = ROW_SIZE;
+    parameters.handleConsole = handleConsole;
+    parameters.attributes = savedAttributes;
+
+    printLine(&parameters, showDescription);
     
     while(line < lineLimit)
     {
@@ -165,8 +180,14 @@ int main()
 
         copyArray(nextRow, currentRow, ROW_SIZE);
         clearArray( nextRow, ROW_SIZE );
+
+        parameters.lineNumber = line+1;
+        copyArray(currentRow, parameters.currentRow, ROW_SIZE);
+        parameters.rowLength = ROW_SIZE;
+        parameters.handleConsole = handleConsole;
+        parameters.attributes = savedAttributes;
         
-        printLine(line+1, currentRow, ROW_SIZE, handleConsole, savedAttributes);
+        printLine(&parameters, showDescription);
 
         if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE);
         line++;
