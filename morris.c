@@ -6,7 +6,7 @@
 
 #define ROW_SIZE 1024
 
-const char *n_desc[] = {
+const char *pN_desc[] = {
     "Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"
 };
 
@@ -48,70 +48,66 @@ WORD getRandomColor()
     }
 }
 
-void printLine(struct lineParameters *parameters, int showDescription)
+void printLine(struct lineParameters *pParameters, int showDescription)
 {
-    unsigned int *dst = (int *)parameters->currentRow;
-    printf("\n %3d |\t", parameters->lineNumber);
-    for(int i = 0; i < parameters->rowLength; i++ )
+    unsigned int *dst = (int *)pParameters->currentRow;
+    printf("\n %3d |\t", pParameters->lineNumber);
+    for(int i = 0; i < pParameters->rowLength; i++ )
     {
         if(i % 2 == 0) 
         {
             WORD color = getRandomColor();
-            SetConsoleTextAttribute(parameters->handleConsole, color);
+            SetConsoleTextAttribute(pParameters->handleConsole, color);
         }
         if(*dst != 0) printf(" %d",*dst);
         dst++;
     }
-    SetConsoleTextAttribute(parameters->handleConsole, parameters->attributes);
+    SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
 }
 
-void clearArray(int *array, size_t len)
+void clearArray(int *pArray, size_t len)
 {
-    unsigned int *dst = array;
     for(int i = 0; i < len; i++ )
     {
-        *dst = 0;
-        dst++;
+        *pArray = 0;
+        pArray++;
     }
 }
 
-void copyArray(int *src, int *destiny, size_t len)
+void copyArray(int *pSrc, int *pTarget, size_t len)
 {
-    unsigned int *psrc = src;
-    unsigned int *pdst = destiny;
     for(int i = 0; i < len; i++ )
     {
-        *pdst = *psrc;
-        pdst++;
-        psrc++;
+        *pTarget = *pSrc;
+        pTarget++;
+        pSrc++;
     }
 }
 
-void enrichRow(int digitQuantity, int digit, int *array)
+void enrichRow(int digitQuantity, int digit, int *pArray)
 {
-    unsigned int *dst = array;
     for(int i = 0; i < ROW_SIZE; i++ )
     {
-        if(*dst == 0) {
-            *dst = digitQuantity;
-            *dst++;
-            *dst = digit; break;
+        if(*pArray == 0) {
+            *pArray = digitQuantity;
+            *pArray++;
+            *pArray = digit; break;
         }
-        *dst++;
+        *pArray++;
     }
 }
 
-void printLineDescription(int lineNumber, int *array, size_t len)
+void printLineDescription(int lineNumber, int *pRow, size_t len)
 {
     printf("\n     |\t  --> ");
     for(int i=0; i < len; i+=2)
     {
-        if(*array == 0) continue;
+        if(*pRow == 0) continue;
 
-        printf("%s ", n_desc[*array++]);
-        printf("%d ", *array++);
+        printf("%s ", pN_desc[*pRow++]);
+        printf("%d ", *pRow++);
 
-        if(*array != 0) printf("and ");
+        if(*pRow != 0) printf("and ");
     }
 }
 
@@ -165,7 +161,7 @@ int main()
 
             if(lastDigit != currentDigit) {
 
-                enrichRow(digitGroupQuantity,lastDigit,nextRow);
+                enrichRow(digitGroupQuantity, lastDigit, nextRow);
 
                 digitGroupQuantity = 0;
 
