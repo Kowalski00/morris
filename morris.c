@@ -2,7 +2,10 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 #define ROW_SIZE 1024
 
@@ -12,6 +15,15 @@ const char *pN_desc[] = {
 
 int lastColorKey;
 
+#ifdef linux
+typedef struct lineParameters {
+    int lineNumber;
+    int currentRow[ROW_SIZE];
+    size_t rowLength;
+} lineParameters;
+#endif
+
+#ifdef _WIN32
 typedef struct lineParameters {
     int lineNumber;
     int currentRow[ROW_SIZE];
@@ -64,6 +76,25 @@ void printLine(struct lineParameters *pParameters, int showDescription)
     }
     SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
 }
+#endif
+
+#ifdef linux
+void printLine(struct lineParameters *pParameters, int showDescription)
+{
+    unsigned int *dst = (int *)pParameters->currentRow;
+    printf("\n %3d |\t", pParameters->lineNumber);
+    for(int i = 0; i < pParameters->rowLength; i++ )
+    {
+        if(i % 2 == 0) 
+        {
+	//set color
+        }
+        if(*dst != 0) printf(" %d",*dst);
+        dst++;
+    }
+}
+#endif
+
 
 void clearArray(int *pArray, size_t len)
 {
@@ -121,10 +152,12 @@ int main()
     int lineLimit;
     int firstNumber;
 
+#ifdef _WIN32
     HANDLE handleConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
     GetConsoleScreenBufferInfo(handleConsole, &consoleInfo);
     WORD savedAttributes = consoleInfo.wAttributes;
+#endif
 
     printf("Do you want to show description below each lines? (1 or 0) \n");
     scanf("%d", &showDescription);
@@ -141,12 +174,20 @@ int main()
     clearArray(nextRow, ROW_SIZE);
     currentRow[0] = firstNumber;
 
+#ifdef linux
+    lineParameters parameters;
+    parameters.lineNumber = line;
+    copyArray(currentRow, parameters.currentRow, ROW_SIZE);	 
+    parameters.rowLength = ROW_SIZE;
+#endif
+#ifdef _WIN32
     lineParameters parameters;
     parameters.lineNumber = line;
     copyArray(currentRow, parameters.currentRow, ROW_SIZE);
     parameters.rowLength = ROW_SIZE;
     parameters.handleConsole = handleConsole;
     parameters.attributes = savedAttributes;
+#endif
 
     printLine(&parameters, showDescription);
     
@@ -177,6 +218,7 @@ int main()
         copyArray(nextRow, currentRow, ROW_SIZE);
         clearArray( nextRow, ROW_SIZE );
 
+#ifdef _WIN32
         parameters.lineNumber = line+1;
         copyArray(currentRow, parameters.currentRow, ROW_SIZE);
         parameters.rowLength = ROW_SIZE;
@@ -184,6 +226,15 @@ int main()
         parameters.attributes = savedAttributes;
         
         printLine(&parameters, showDescription);
+#endif
+#ifdef linux
+        parameters.lineNumber = line+1;
+        copyArray(currentRow, parameters.currentRow, ROW_SIZE);
+        parameters.rowLength = ROW_SIZE;
+        
+        printLine(&parameters, showDescription);
+#endif
+
 
         if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE);
         line++;
