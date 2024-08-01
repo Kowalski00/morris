@@ -3,6 +3,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef linux
+#include <unistd.h>
+#endif
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -64,6 +68,7 @@ void printLine(struct lineParameters *pParameters, int showDescription)
 {
     unsigned int *dst = (int *)pParameters->currentRow;
     printf("\n %3d |\t", pParameters->lineNumber);
+    fflush(stdout);
     for(int i = 0; i < pParameters->rowLength; i++ )
     {
         if(i % 2 == 0) 
@@ -72,6 +77,7 @@ void printLine(struct lineParameters *pParameters, int showDescription)
             SetConsoleTextAttribute(pParameters->handleConsole, color);
         }
         if(*dst != 0) printf(" %d",*dst);
+	fflush(stdout);
         dst++;
     }
     SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
@@ -83,6 +89,7 @@ void printLine(struct lineParameters *pParameters, int showDescription)
 {
     unsigned int *dst = (int *)pParameters->currentRow;
     printf("\n %3d |\t", pParameters->lineNumber);
+    fflush(stdout);
     for(int i = 0; i < pParameters->rowLength; i++ )
     {
         if(i % 2 == 0) 
@@ -90,6 +97,7 @@ void printLine(struct lineParameters *pParameters, int showDescription)
 	//set color
         }
         if(*dst != 0) printf(" %d",*dst);
+	    fflush(stdout);
         dst++;
     }
 }
@@ -131,14 +139,17 @@ void enrichRow(int digitQuantity, int digit, int *pArray)
 void printLineDescription(int lineNumber, int *pRow, size_t len)
 {
     printf("\n     |\t  --> ");
+    fflush(stdout);
     for(int i=0; i < len; i+=2)
     {
         if(*pRow == 0) continue;
 
         printf("%s ", pN_desc[*pRow++]);
         printf("%d ", *pRow++);
+	    fflush(stdout);
 
         if(*pRow != 0) printf("and ");
+	    fflush(stdout);
     }
 }
 
@@ -238,6 +249,7 @@ int main()
 
         if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE);
         line++;
+	sleep(0.5);
     }
     printf("\n");
     return 0;
