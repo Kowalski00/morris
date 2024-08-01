@@ -66,7 +66,8 @@ WORD getRandomColor()
 
 void printLine(struct lineParameters *pParameters, int showDescription)
 {
-    unsigned int *dst = (int *)pParameters->currentRow;
+    WORD colorOrder[pParameters->rowLength];
+    unsigned int *pParamCurrentRow = (int *)pParameters->currentRow;
     printf("\n %3d |\t", pParameters->lineNumber);
     fflush(stdout);
     for(int i = 0; i < pParameters->rowLength; i++ )
@@ -74,13 +75,17 @@ void printLine(struct lineParameters *pParameters, int showDescription)
         if(i % 2 == 0) 
         {
             WORD color = getRandomColor();
+            colorOrder[i] = color;
             SetConsoleTextAttribute(pParameters->handleConsole, color);
         }
-        if(*dst != 0) printf(" %d",*dst);
-	fflush(stdout);
-        dst++;
+        if(*pParamCurrentRow != 0) printf(" %d",*pParamCurrentRow);
+        pParamCurrentRow++;
+	    fflush(stdout);
     }
     SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
+    if(showDescription) {
+        printf("\n     |\t  --> "); 
+    }
 }
 #endif
 
