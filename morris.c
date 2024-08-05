@@ -34,6 +34,7 @@ typedef struct lineParameters {
     size_t rowLength;
     HANDLE handleConsole;
     WORD attributes;
+    WORD *pBitSetColor;
 } lineParameters;
 
 WORD getRandomColor()
@@ -66,26 +67,29 @@ WORD getRandomColor()
 
 void printLine(struct lineParameters *pParameters, int showDescription)
 {
-    WORD colorOrder[pParameters->rowLength];
     unsigned int *pParamCurrentRow = (int *)pParameters->currentRow;
+    WORD *pBitSetColor = (WORD *)pParameters->pBitSetColor;
     printf("\n %3d |\t", pParameters->lineNumber);
     fflush(stdout);
     for(int i = 0; i < pParameters->rowLength; i++ )
     {
+        WORD color;
         if(i % 2 == 0) 
         {
-            WORD color = getRandomColor();
-            colorOrder[i] = color;
+            color = getRandomColor();
             SetConsoleTextAttribute(pParameters->handleConsole, color);
         }
         if(*pParamCurrentRow != 0) printf(" %d",*pParamCurrentRow);
         pParamCurrentRow++;
 	    fflush(stdout);
+
+        if(showDescription)
+        {
+            *pBitSetColor = color;
+            pBitSetColor++;
+        }
     }
     SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
-    if(showDescription) {
-        printf("\n     |\t  --> "); 
-    }
 }
 #endif
 
@@ -135,23 +139,36 @@ void enrichRow(int digitQuantity, int digit, int *pArray)
         if(*pArray == 0) {
             *pArray = digitQuantity;
             *pArray++;
-            *pArray = digit; break;
+            *pArray = digit;
+            break;
         }
         *pArray++;
     }
 }
 
-void printLineDescription(int lineNumber, int *pRow, size_t len)
+void printLineDescription(int lineNumber, int *pRow, size_t len, struct lineParameters *pParameters)
 {
+#ifdef _WIN32
+    WORD *pBitSetColor = (WORD *)pParameters->pBitSetColor;
+#endif
     printf("\n     |\t  --> ");
     fflush(stdout);
     for(int i=0; i < len; i+=2)
     {
         if(*pRow == 0) continue;
-
+            
+#ifdef _WIN32
+        WORD color = *pBitSetColor;
+        SetConsoleTextAttribute(pParameters->handleConsole, color);
+        pBitSetColor++;
+#endif
         printf("%s ", pN_desc[*pRow++]);
         printf("%d ", *pRow++);
 	    fflush(stdout);
+
+#ifdef _WIN32
+        SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
+#endif
 
         if(*pRow != 0) printf("and ");
 	    fflush(stdout);
@@ -205,6 +222,13 @@ int main()
     parameters.attributes = savedAttributes;
 #endif
 
+    if(showDescription) 
+    {
+#ifdef _WIN32
+       parameters.pBitSetColor = (WORD *) malloc(ROW_SIZE*sizeof(WORD)); 
+#endif
+    }
+
     printLine(&parameters, showDescription);
     
     while(line < lineLimit)
@@ -252,7 +276,7 @@ int main()
 #endif
 
 
-        if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE);
+        if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE, &parameters);
         line++;
 	sleep(0.5);
     }
