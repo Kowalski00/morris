@@ -161,6 +161,7 @@ void printLineDescription(int lineNumber, int *pRow, size_t len, struct linePara
         WORD color = *pBitSetColor;
         SetConsoleTextAttribute(pParameters->handleConsole, color);
         pBitSetColor++;
+        pBitSetColor++;
 #endif
         printf("%s ", pN_desc[*pRow++]);
         printf("%d ", *pRow++);
@@ -278,7 +279,7 @@ int main()
 
         if(showDescription) printLineDescription(line+1, currentRow, ROW_SIZE, &parameters);
         line++;
-	sleep(0.5);
+	//sleep(0.5);
     }
     printf("\n");
     return 0;
