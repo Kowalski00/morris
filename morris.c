@@ -13,6 +13,13 @@
 
 #define ROW_SIZE 1024
 
+#ifdef linux
+#define COLOR_DEFAULT  "\x1B[0m"
+#define COLOR_RED      "\x1B[31m"
+#define COLOR_GRN      "\x1B[32m"
+#define COLOR_BLU      "\x1B[34m"
+#endif
+
 const char *pN_desc[] = {
     "Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"
 };
@@ -37,6 +44,7 @@ typedef struct lineParameters {
     WORD *pBitSetColor;
 } lineParameters;
 
+#ifdef _WIN32
 WORD getRandomColor()
 {
     int colorKey;
@@ -64,6 +72,37 @@ WORD getRandomColor()
         }
     }
 }
+#endif
+
+#ifdef linux
+char getRandomColor()
+{
+    int colorKey;
+    do{
+        colorKey =  rand() % 4;
+    } while (colorKey == lastColorKey || colorKey == 0);
+    lastColorKey = colorKey;
+        
+    switch(colorKey)
+    {
+        case 1:
+        {
+            return COLOR_BLU;
+            break;
+        }
+        case 2:
+        {
+            return COLOR_GRN;
+            break;
+        }
+        case 3:
+        {
+            return COLOR_RED;
+            break;
+        }
+    }
+}
+#endif
 
 void printLine(struct lineParameters *pParameters, int showDescription)
 {
@@ -101,11 +140,14 @@ void printLine(struct lineParameters *pParameters, int showDescription)
     fflush(stdout);
     for(int i = 0; i < pParameters->rowLength; i++ )
     {
+        char color;
         if(i % 2 == 0) 
         {
-	//set color
+            color = getRandomColor();
+            printf("%s", color);
         }
         if(*dst != 0) printf(" %d",*dst);
+        printf("%s", COLOR_DEFAULT);
 	    fflush(stdout);
         dst++;
     }
