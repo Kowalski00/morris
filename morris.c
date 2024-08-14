@@ -31,6 +31,7 @@ typedef struct lineParameters {
     int lineNumber;
     int currentRow[ROW_SIZE];
     size_t rowLength;
+    char *pBitSetColor;
 } lineParameters;
 #endif
 
@@ -43,6 +44,7 @@ typedef struct lineParameters {
     WORD attributes;
     WORD *pBitSetColor;
 } lineParameters;
+#endif
 
 #ifdef _WIN32
 WORD getRandomColor()
@@ -75,7 +77,7 @@ WORD getRandomColor()
 #endif
 
 #ifdef linux
-char getRandomColor()
+char * getRandomColor()
 {
     int colorKey;
     do{
@@ -104,6 +106,7 @@ char getRandomColor()
 }
 #endif
 
+#ifdef _WIN32
 void printLine(struct lineParameters *pParameters, int showDescription)
 {
     unsigned int *pParamCurrentRow = (int *)pParameters->currentRow;
@@ -136,21 +139,29 @@ void printLine(struct lineParameters *pParameters, int showDescription)
 void printLine(struct lineParameters *pParameters, int showDescription)
 {
     unsigned int *dst = (int *)pParameters->currentRow;
+    char *pBitSetColor = (char *)pParameters->pBitSetColor;
     printf("\n %3d |\t", pParameters->lineNumber);
     fflush(stdout);
     for(int i = 0; i < pParameters->rowLength; i++ )
     {
-        char color;
+        char *pColor;
         if(i % 2 == 0) 
         {
-            color = getRandomColor();
-            printf("%s", color);
+            pColor = getRandomColor();
+            printf("%s", pColor);
         }
         if(*dst != 0) printf(" %d",*dst);
-        printf("%s", COLOR_DEFAULT);
 	    fflush(stdout);
         dst++;
+
+        if(showDescription)
+        {
+            *pBitSetColor = *pColor;
+            pBitSetColor++;
+        }
     }
+    
+    printf("%s", COLOR_DEFAULT);
 }
 #endif
 
@@ -193,6 +204,9 @@ void printLineDescription(int lineNumber, int *pRow, size_t len, struct linePara
 #ifdef _WIN32
     WORD *pBitSetColor = (WORD *)pParameters->pBitSetColor;
 #endif
+#ifdef linux
+    char *pBitSetColor = (char *)pParameters->pBitSetColor;
+#endif
     printf("\n     |\t  --> ");
     fflush(stdout);
     for(int i=0; i < len; i+=2)
@@ -205,12 +219,21 @@ void printLineDescription(int lineNumber, int *pRow, size_t len, struct linePara
         pBitSetColor++;
         pBitSetColor++;
 #endif
+#ifdef linux
+        char *pColor = *pBitSetColor;
+        printf("%s", pColor);
+        pBitSetColor++;
+        pBitSetColor++;
+#endif
         printf("%s ", pN_desc[*pRow++]);
         printf("%d ", *pRow++);
 	    fflush(stdout);
 
 #ifdef _WIN32
         SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
+#endif
+#ifdef linux
+        printf("%s", COLOR_DEFAULT);
 #endif
 
         if(*pRow != 0) printf("and ");
@@ -269,6 +292,9 @@ int main()
     {
 #ifdef _WIN32
        parameters.pBitSetColor = (WORD *) malloc(ROW_SIZE*sizeof(WORD)); 
+#endif
+#ifdef linux
+       parameters.pBitSetColor = (char *) malloc(ROW_SIZE*sizeof(char)); 
 #endif
     }
 
