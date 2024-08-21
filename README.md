@@ -25,5 +25,5 @@ The goals for this project are:
 - [X] Describe the sequence along the lines;
 - [X] Ask for a single digit number to begin the sequence with that number;
 - [X] Ask for any number to begin the sequence;
-- [ ] Match by color when describing;
-- [ ] Print description in a more elegant way.
+- [X] Match by color when describing;
+- [ ] Create platform independent api.
