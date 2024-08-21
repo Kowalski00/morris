@@ -31,7 +31,7 @@ typedef struct lineParameters {
     int lineNumber;
     int currentRow[ROW_SIZE];
     size_t rowLength;
-    char *pBitSetColor;
+    int *pBitSetColor;
 } lineParameters;
 #endif
 
@@ -77,14 +77,20 @@ WORD getRandomColor()
 #endif
 
 #ifdef linux
-char * getRandomColor()
+int getRandomColorKey()
 {
     int colorKey;
     do{
         colorKey =  rand() % 4;
     } while (colorKey == lastColorKey || colorKey == 0);
     lastColorKey = colorKey;
-        
+    
+    return colorKey;    
+}
+#endif
+
+char * getColor(int colorKey)
+{
     switch(colorKey)
     {
         case 1:
@@ -104,7 +110,6 @@ char * getRandomColor()
         }
     }
 }
-#endif
 
 #ifdef _WIN32
 void printLine(struct lineParameters *pParameters, int showDescription)
@@ -123,7 +128,7 @@ void printLine(struct lineParameters *pParameters, int showDescription)
         }
         if(*pParamCurrentRow != 0) printf(" %d",*pParamCurrentRow);
         pParamCurrentRow++;
-	    fflush(stdout);
+	fflush(stdout);
 
         if(showDescription)
         {
@@ -142,25 +147,27 @@ void printLine(struct lineParameters *pParameters, int showDescription)
     char *pBitSetColor = (char *)pParameters->pBitSetColor;
     printf("\n %3d |\t", pParameters->lineNumber);
     fflush(stdout);
+    char *pColor;
+    int colorKey;
     for(int i = 0; i < pParameters->rowLength; i++ )
     {
-        char *pColor;
         if(i % 2 == 0) 
         {
-            pColor = getRandomColor();
+            colorKey = getRandomColorKey();
+	    pColor = getColor(colorKey);
             printf("%s", pColor);
         }
         if(*dst != 0) printf(" %d",*dst);
+
 	    fflush(stdout);
         dst++;
 
         if(showDescription)
         {
-            *pBitSetColor = *pColor;
-            pBitSetColor++;
+		    *pBitSetColor = colorKey;
+		    pBitSetColor++;
         }
     }
-    
     printf("%s", COLOR_DEFAULT);
 }
 #endif
@@ -220,8 +227,7 @@ void printLineDescription(int lineNumber, int *pRow, size_t len, struct linePara
         pBitSetColor++;
 #endif
 #ifdef linux
-        char *pColor = *pBitSetColor;
-        printf("%s", pColor);
+	    printf("%s",getColor(*pBitSetColor));
         pBitSetColor++;
         pBitSetColor++;
 #endif
@@ -294,7 +300,7 @@ int main()
        parameters.pBitSetColor = (WORD *) malloc(ROW_SIZE*sizeof(WORD)); 
 #endif
 #ifdef linux
-       parameters.pBitSetColor = (char *) malloc(ROW_SIZE*sizeof(char)); 
+       parameters.pBitSetColor = (int *) malloc(ROW_SIZE*sizeof(int)); 
 #endif
     }
 
