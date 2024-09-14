@@ -5,35 +5,16 @@
 
 #ifdef linux
 #include <unistd.h>
+#include "morris_unix.h"
 #endif
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
-#define ROW_SIZE 1024
-
-#ifdef linux
-#define COLOR_DEFAULT  "\x1B[0m"
-#define COLOR_RED      "\x1B[31m"
-#define COLOR_GRN      "\x1B[32m"
-#define COLOR_BLU      "\x1B[34m"
-#endif
-
 const char *pN_desc[] = {
     "Zero","One","Two","Three","Four","Five","Six","Seven","Eight","Nine"
 };
-
-int lastColorKey;
-
-#ifdef linux
-typedef struct lineParameters {
-    int lineNumber;
-    int currentRow[ROW_SIZE];
-    size_t rowLength;
-    int *pBitSetColor;
-} lineParameters;
-#endif
 
 #ifdef _WIN32
 typedef struct lineParameters {
@@ -73,19 +54,6 @@ WORD getRandomColor()
             break;
         }
     }
-}
-#endif
-
-#ifdef linux
-int getRandomColorKey()
-{
-    int colorKey;
-    do{
-        colorKey =  rand() % 4;
-    } while (colorKey == lastColorKey || colorKey == 0);
-    lastColorKey = colorKey;
-    
-    return colorKey;    
 }
 #endif
 
@@ -139,39 +107,6 @@ void printLine(struct lineParameters *pParameters, int showDescription)
     SetConsoleTextAttribute(pParameters->handleConsole, pParameters->attributes);
 }
 #endif
-
-#ifdef linux
-void printLine(struct lineParameters *pParameters, int showDescription)
-{
-    unsigned int *dst = (int *)pParameters->currentRow;
-    char *pBitSetColor = (char *)pParameters->pBitSetColor;
-    printf("\n %3d |\t", pParameters->lineNumber);
-    fflush(stdout);
-    char *pColor;
-    int colorKey;
-    for(int i = 0; i < pParameters->rowLength; i++ )
-    {
-        if(i % 2 == 0) 
-        {
-            colorKey = getRandomColorKey();
-	    pColor = getColor(colorKey);
-            printf("%s", pColor);
-        }
-        if(*dst != 0) printf(" %d",*dst);
-
-	    fflush(stdout);
-        dst++;
-
-        if(showDescription)
-        {
-		    *pBitSetColor = colorKey;
-		    pBitSetColor++;
-        }
-    }
-    printf("%s", COLOR_DEFAULT);
-}
-#endif
-
 
 void clearArray(int *pArray, size_t len)
 {
@@ -279,14 +214,9 @@ int main()
     clearArray(nextRow, ROW_SIZE);
     currentRow[0] = firstNumber;
 
-#ifdef linux
     lineParameters parameters;
-    parameters.lineNumber = line;
-    copyArray(currentRow, parameters.currentRow, ROW_SIZE);	 
-    parameters.rowLength = ROW_SIZE;
-#endif
+    parameters = createLineParameters(line, currentRow);
 #ifdef _WIN32
-    lineParameters parameters;
     parameters.lineNumber = line;
     copyArray(currentRow, parameters.currentRow, ROW_SIZE);
     parameters.rowLength = ROW_SIZE;
